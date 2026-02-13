@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: quotes-postgres
+    environment:
+      POSTGRES_DB: quotes_db
+      POSTGRES_USER: quotes_user
+      POSTGRES_PASSWORD: quotes_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quotes_user -d quotes_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: quotes-api
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: quotes_db
+      DB_USER: quotes_user
+      DB_PASSWORD: quotes_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Run migrations (schema + seed) before starting the app
+    command: sh -c "npm run db:init && npm start"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: quotes-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@quotes.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

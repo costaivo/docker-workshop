@@ -1,0 +1,16 @@
+{
+  "name": "quotes-api",
+  "version": "1.0.0",
+  "description": "Quotes API with PostgreSQL",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "db:schema": "node scripts/init-db.js --schema-only",
+    "db:seed": "node scripts/init-db.js --seed-only",
+    "db:init": "node scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.11.3"
+  }
+}
